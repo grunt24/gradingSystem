@@ -1,0 +1,280 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\controllers\\academicperiodscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\controllers\\academicperiodscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\core\\models\\midtermgrade.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\core\\models\\midtermgrade.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\core\\models\\finalsgrade.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\core\\models\\finalsgrade.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\core\\models\\subject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\core\\models\\subject.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\core\\models\\teacher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\core\\models\\teacher.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\services\\gradecalculationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\services\\gradecalculationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\controllers\\gradecalculationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\controllers\\gradecalculationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\controllers\\finalsgradecontroller .cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\controllers\\finalsgradecontroller .cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\irepositories\\igradecalculationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\irepositories\\igradecalculationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\controllers\\gradescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\controllers\\gradescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-main\\src\\api\\loginService.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-main\\src\\api\\axiosInstance.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-main\\src\\api\\academicPeriodService.js||{14D17961-FE51-464D-9111-C4AF11D7D99A}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\core\\models\\academicperiod.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\core\\models\\academicperiod.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|c:\\users\\pc\\onedrive\\desktop\\shaina\\capstone-backend-main\\auth\\backendapi\\context\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{DBC18CA3-42E5-410C-8598-D2E2E34E2757}|BackendApi\\BackendApi.csproj|solutionrelative:backendapi\\context\\appdbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 244,
+          "SelectedChildIndex": 3,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "GradeCalculationsController.cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Controllers\\GradeCalculationsController.cs",
+              "RelativeDocumentMoniker": "BackendApi\\Controllers\\GradeCalculationsController.cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Controllers\\GradeCalculationsController.cs",
+              "RelativeToolTip": "BackendApi\\Controllers\\GradeCalculationsController.cs",
+              "ViewState": "AgIAALcDAAAAAAAAAAAQwMIDAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-08T16:43:03.339Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "GradeCalculationService.cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Services\\GradeCalculationService.cs",
+              "RelativeDocumentMoniker": "BackendApi\\Services\\GradeCalculationService.cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Services\\GradeCalculationService.cs",
+              "RelativeToolTip": "BackendApi\\Services\\GradeCalculationService.cs",
+              "ViewState": "AgIAAIEDAAAAAAAAAAAAwKsDAAAvAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-08T16:46:42.994Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "IGradeCalculationService.cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\IRepositories\\IGradeCalculationService.cs",
+              "RelativeDocumentMoniker": "BackendApi\\IRepositories\\IGradeCalculationService.cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\IRepositories\\IGradeCalculationService.cs",
+              "RelativeToolTip": "BackendApi\\IRepositories\\IGradeCalculationService.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAzwCQAAAATAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-08T16:45:24.01Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "AcademicPeriodsController.cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Controllers\\AcademicPeriodsController.cs",
+              "RelativeDocumentMoniker": "BackendApi\\Controllers\\AcademicPeriodsController.cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Controllers\\AcademicPeriodsController.cs",
+              "RelativeToolTip": "BackendApi\\Controllers\\AcademicPeriodsController.cs",
+              "ViewState": "AgIAAAIAAAAAAAAAAAAAABEAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-14T22:29:22.025Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "AppDbContext.cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Context\\AppDbContext.cs",
+              "RelativeDocumentMoniker": "BackendApi\\Context\\AppDbContext.cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Context\\AppDbContext.cs",
+              "RelativeToolTip": "BackendApi\\Context\\AppDbContext.cs",
+              "ViewState": "AgIAACYAAAAAAAAAAAAowEAAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-14T22:30:32.148Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "AcademicPeriod.cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Core\\Models\\AcademicPeriod.cs",
+              "RelativeDocumentMoniker": "BackendApi\\Core\\Models\\AcademicPeriod.cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Core\\Models\\AcademicPeriod.cs",
+              "RelativeToolTip": "BackendApi\\Core\\Models\\AcademicPeriod.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-14T22:30:22.764Z",
+              "IsPinned": true
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Program.cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Program.cs",
+              "RelativeDocumentMoniker": "BackendApi\\Program.cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Program.cs",
+              "RelativeToolTip": "BackendApi\\Program.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-22T03:07:58.471Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "Teacher.cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Core\\Models\\Teacher.cs",
+              "RelativeDocumentMoniker": "BackendApi\\Core\\Models\\Teacher.cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Core\\Models\\Teacher.cs",
+              "RelativeToolTip": "BackendApi\\Core\\Models\\Teacher.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-22T03:10:07.266Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "Subject.cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Core\\Models\\Subject.cs",
+              "RelativeDocumentMoniker": "BackendApi\\Core\\Models\\Subject.cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Core\\Models\\Subject.cs",
+              "RelativeToolTip": "BackendApi\\Core\\Models\\Subject.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-22T03:10:08.194Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "MidtermGrade.cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Core\\Models\\MidtermGrade.cs",
+              "RelativeDocumentMoniker": "BackendApi\\Core\\Models\\MidtermGrade.cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Core\\Models\\MidtermGrade.cs",
+              "RelativeToolTip": "BackendApi\\Core\\Models\\MidtermGrade.cs",
+              "ViewState": "AgIAAFYAAAAAAAAAAAAAAFYAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-22T03:06:43.809Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "FinalsGrade.cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Core\\Models\\FinalsGrade.cs",
+              "RelativeDocumentMoniker": "BackendApi\\Core\\Models\\FinalsGrade.cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Core\\Models\\FinalsGrade.cs",
+              "RelativeToolTip": "BackendApi\\Core\\Models\\FinalsGrade.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAAwwBkAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-22T03:06:39.599Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "GradesController.cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Controllers\\GradesController.cs",
+              "RelativeDocumentMoniker": "BackendApi\\Controllers\\GradesController.cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Controllers\\GradesController.cs",
+              "RelativeToolTip": "BackendApi\\Controllers\\GradesController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-22T02:34:57.236Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "FinalsGradeController .cs",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Controllers\\FinalsGradeController .cs",
+              "RelativeDocumentMoniker": "BackendApi\\Controllers\\FinalsGradeController .cs",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-backend-main\\Auth\\BackendApi\\Controllers\\FinalsGradeController .cs",
+              "RelativeToolTip": "BackendApi\\Controllers\\FinalsGradeController .cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAYwCQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-11-22T01:27:17.962Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "loginService.js",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-main\\src\\api\\loginService.js",
+              "RelativeDocumentMoniker": "..\\..\\capstone-main\\src\\api\\loginService.js",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-main\\src\\api\\loginService.js",
+              "RelativeToolTip": "..\\..\\capstone-main\\src\\api\\loginService.js",
+              "ViewState": "AgIAAAgAAABAMzMzM3MvwA8AAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-11-17T06:40:59.665Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "axiosInstance.js",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-main\\src\\api\\axiosInstance.js",
+              "RelativeDocumentMoniker": "..\\..\\capstone-main\\src\\api\\axiosInstance.js",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-main\\src\\api\\axiosInstance.js",
+              "RelativeToolTip": "..\\..\\capstone-main\\src\\api\\axiosInstance.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-11-17T06:31:10.73Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "academicPeriodService.js",
+              "DocumentMoniker": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-main\\src\\api\\AcademicPeriodService.js",
+              "RelativeDocumentMoniker": "..\\..\\capstone-main\\src\\api\\AcademicPeriodService.js",
+              "ToolTip": "C:\\Users\\PC\\OneDrive\\Desktop\\Shaina\\capstone-main\\src\\api\\AcademicPeriodService.js",
+              "RelativeToolTip": "..\\..\\capstone-main\\src\\api\\AcademicPeriodService.js",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
+              "WhenOpened": "2025-11-17T06:03:27.824Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
