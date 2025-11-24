@@ -22,4 +22,14 @@
 
 
     }
+
+    public class StudentSubjectSpDto
+    {
+        public int StudentSubjectId { get; set; }    // ss.Id
+        public string? StudentFullName { get; set; } // s.Fullname
+        public int SubjectId { get; set; }           // subj.Id
+        public string? SubjectName { get; set; }     // subj.SubjectName
+        public string? AcademicYear { get; set; }    // CAST(ap.StartYear AS VARCHAR) + '-' + CAST(ap.EndYear AS VARCHAR)
+        public string? Semester { get; set; }        // ap.Semester
+    }
 }

@@ -7,11 +7,18 @@ namespace BackendApi.Core.Models.Dto
         public int StudentId { get; set; }
         public List<int>? SubjectIds { get; set; }
     }
+
+    public class StudentSubjectsDtoV2
+    {
+        public List<int> StudentIds { get; set; } = new List<int>();
+        public List<int>? SubjectIds { get; set; }
+    }
     public class StudentSubjectGroupedDto
     {
         public int UserId { get; set; }
         public string Fullname { get; set; } = string.Empty;
         public List<SubjectItemDto> Subjects { get; set; } = new();
+        //public int AcademicYeadId { get; set; }
     }
 
     public class SubjectItemDto

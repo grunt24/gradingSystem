@@ -100,11 +100,11 @@ namespace BackendApi.Controllers
                 await _dbContext.SaveChangesAsync();
 
                 // ✅ Reset all student assigned subjects
-                var allStudentSubjects = await _dbContext.StudentSubjects.ToListAsync();
-                if (allStudentSubjects.Any())
-                {
-                    _dbContext.StudentSubjects.RemoveRange(allStudentSubjects);
-                }
+                //var allStudentSubjects = await _dbContext.StudentSubjects.ToListAsync();
+                //if (allStudentSubjects.Any())
+                //{
+                //    _dbContext.StudentSubjects.RemoveRange(allStudentSubjects);
+                //}
 
                 await _dbContext.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -148,14 +148,14 @@ namespace BackendApi.Controllers
                 await _dbContext.SaveChangesAsync();
 
                 // Optionally reset all student subjects and grades if this period becomes current
-                if (period.IsCurrent)
-                {
-                    var allStudentSubjects = await _dbContext.StudentSubjects.ToListAsync();
-                    if (allStudentSubjects.Any())
-                        _dbContext.StudentSubjects.RemoveRange(allStudentSubjects);
+                //if (period.IsCurrent)
+                //{
+                //    var allStudentSubjects = await _dbContext.StudentSubjects.ToListAsync();
+                //    if (allStudentSubjects.Any())
+                //        _dbContext.StudentSubjects.RemoveRange(allStudentSubjects);
 
-                    await _dbContext.SaveChangesAsync();
-                }
+                //    await _dbContext.SaveChangesAsync();
+                //}
 
                 await transaction.CommitAsync();
                 return Ok(new { message = "Academic period updated successfully." });

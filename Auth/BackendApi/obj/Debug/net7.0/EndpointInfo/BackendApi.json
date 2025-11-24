@@ -1276,17 +1276,17 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StudentSubjectsDto"
+                "$ref": "#/components/schemas/StudentSubjectsDtoV2"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/StudentSubjectsDto"
+                "$ref": "#/components/schemas/StudentSubjectsDtoV2"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/StudentSubjectsDto"
+                "$ref": "#/components/schemas/StudentSubjectsDtoV2"
               }
             }
           }
@@ -1448,6 +1448,160 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/StudentSubjects/student": {
+      "get": {
+        "tags": [
+          "StudentSubjects"
+        ],
+        "parameters": [
+          {
+            "name": "academicYear",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "semester",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StudentSubjectSpDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StudentSubjectSpDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StudentSubjectSpDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/StudentSubjects/add": {
+      "post": {
+        "tags": [
+          "StudentSubjects"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCurriculumSubjectDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCurriculumSubjectDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddCurriculumSubjectDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/StudentSubjects/student/{studentId}/recommended-subjects": {
+      "get": {
+        "tags": [
+          "StudentSubjects"
+        ],
+        "parameters": [
+          {
+            "name": "studentId",
+            "in": "path",
+            "required": true,
+            "style": "simple",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/StudentSubjects/update": {
+      "post": {
+        "tags": [
+          "StudentSubjects"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStudentSubjectsDTO"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStudentSubjectsDTO"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateStudentSubjectsDTO"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/StudentSubjects/curriculum": {
+      "get": {
+        "tags": [
+          "StudentSubjects"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
           }
         }
       }
@@ -2054,6 +2208,24 @@
           "academicPeriodId": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "AddCurriculumSubjectDto": {
+        "type": "object",
+        "properties": {
+          "subjectId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "yearLevel": {
+            "type": "string",
+            "nullable": true
+          },
+          "semester": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3347,6 +3519,7 @@
       },
       "StudentSubject": {
         "required": [
+          "academicPeriodId",
           "studentID",
           "subjectID"
         ],
@@ -3372,6 +3545,43 @@
           },
           "grade": {
             "$ref": "#/components/schemas/Grade"
+          },
+          "academicPeriodId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "academicPeriod": {
+            "$ref": "#/components/schemas/AcademicPeriod"
+          }
+        },
+        "additionalProperties": false
+      },
+      "StudentSubjectSpDto": {
+        "type": "object",
+        "properties": {
+          "studentSubjectId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "studentFullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "subjectId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "subjectName": {
+            "type": "string",
+            "nullable": true
+          },
+          "academicYear": {
+            "type": "string",
+            "nullable": true
+          },
+          "semester": {
+            "type": "string",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -3382,6 +3592,28 @@
           "studentId": {
             "type": "integer",
             "format": "int32"
+          },
+          "subjectIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "StudentSubjectsDtoV2": {
+        "type": "object",
+        "properties": {
+          "studentIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
           },
           "subjectIds": {
             "type": "array",
@@ -3575,6 +3807,24 @@
         },
         "additionalProperties": false
       },
+      "UpdateStudentSubjectsDTO": {
+        "type": "object",
+        "properties": {
+          "studentId": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "curriculumSubjectIds": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "UserCredentialsDto": {
         "type": "object",
         "properties": {
@@ -3632,7 +3882,8 @@
           1,
           2,
           3,
-          4
+          4,
+          5
         ],
         "type": "integer",
         "format": "int32"

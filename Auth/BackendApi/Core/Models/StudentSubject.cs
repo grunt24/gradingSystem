@@ -20,5 +20,9 @@ namespace BackendApi.Core.Models
 
         public Subject? Subject { get; set; }
         public Grade? Grade { get; set; }
+        [Required]
+        [ForeignKey("AcademicPeriod")]
+        public int AcademicPeriodId { get; set; }
+        public AcademicPeriod? AcademicPeriod { get; set; }
     }
 }

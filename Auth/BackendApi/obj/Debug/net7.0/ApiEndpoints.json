@@ -735,7 +735,7 @@
     "Parameters": [
       {
         "Name": "dto",
-        "Type": "BackendApi.Core.Models.Dto.StudentSubjectsDto",
+        "Type": "BackendApi.Core.Models.Dto.StudentSubjectsDtoV2",
         "IsRequired": true
       }
     ],
@@ -833,6 +833,95 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.StudentSubjectsController",
+    "Method": "AddToCurriculum",
+    "RelativePath": "api/StudentSubjects/add",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BackendApi.Core.Models.AddCurriculumSubjectDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.StudentSubjectsController",
+    "Method": "GetAllCurriculumSubjects",
+    "RelativePath": "api/StudentSubjects/curriculum",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.StudentSubjectsController",
+    "Method": "GetSubjectsForCurrentStudent",
+    "RelativePath": "api/StudentSubjects/student",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "academicYear",
+        "Type": "System.String",
+        "IsRequired": false
+      },
+      {
+        "Name": "semester",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.IEnumerable\u00601[[BackendApi.Core.Models.Dto.StudentSubjectSpDto, BackendApi, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.StudentSubjectsController",
+    "Method": "GetStudentRecommendedSubjects",
+    "RelativePath": "api/StudentSubjects/student/{studentId}/recommended-subjects",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "studentId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.StudentSubjectsController",
+    "Method": "UpdateStudentSubjects",
+    "RelativePath": "api/StudentSubjects/update",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BackendApi.Core.Models.UpdateStudentSubjectsDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "BackendApi.Controllers.SubjectsController",

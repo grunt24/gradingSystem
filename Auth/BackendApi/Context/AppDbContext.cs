@@ -26,6 +26,9 @@ namespace BackendApi.Context
         public DbSet<GradeWeights> GradeWeights { get; set; }
         public DbSet<AcademicPeriod> AcademicPeriods { get; set; }
         public DbSet<StudentEnrollment> StudentEnrollments { get; set; }
+        public DbSet<CurriculumSubject> CurriculumSubjects { get; set; }
+        
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

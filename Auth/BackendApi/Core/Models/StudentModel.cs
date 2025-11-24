@@ -10,6 +10,7 @@ namespace BackendApi.Core.Models
         Admin,
         Student,
         Teacher,
+        Coordinator
     }
     public class StudentModel
     {
