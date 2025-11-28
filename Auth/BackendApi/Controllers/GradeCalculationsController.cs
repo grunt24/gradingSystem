@@ -960,12 +960,11 @@ namespace BackendApi.Controllers
         [HttpPost("calculate-finals-all")]
         public async Task<IActionResult> CalculateFinalsAllAsync()
         {
-            var result = await _gradeCalculationService.CalculateFinalsGradesForAllSubjectsAsync();
-            return Ok(result);
+            await _gradeCalculationService.CalculateFinalsGradesForAllSubjectsAsync();
+
+            // Return a simple success response
+            return Ok(new { message = "Finals grades calculated successfully." });
         }
-
-
-
 
         // GET: api/midterm-grades/{subjectId}/{academicPeriodId}
         [HttpGet("{subjectId:int}/{academicPeriodId:int}")]

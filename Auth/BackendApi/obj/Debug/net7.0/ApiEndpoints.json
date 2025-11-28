@@ -42,6 +42,16 @@
   },
   {
     "ContainingType": "BackendApi.Controllers.AcademicPeriodsController",
+    "Method": "GetGradeSubmissionStatus",
+    "RelativePath": "api/AcademicPeriods/grade-submission-status",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.AcademicPeriodsController",
     "Method": "SetCurrentAcademicPeriod",
     "RelativePath": "api/AcademicPeriods/set-current",
     "HttpMethod": "POST",
@@ -51,6 +61,22 @@
       {
         "Name": "dto",
         "Type": "BackendApi.Controllers.AcademicPeriodsController\u002BAcademicPeriodDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.AcademicPeriodsController",
+    "Method": "UpdateSubmissionDates",
+    "RelativePath": "api/AcademicPeriods/update-submission-dates",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BackendApi.Controllers.AcademicPeriodsController\u002BUpdateSubmissionDateDto",
         "IsRequired": true
       }
     ],
@@ -298,6 +324,37 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.GradeCalculation.FinalsGradeController",
+    "Method": "CalculateFinal",
+    "RelativePath": "api/FinalsGrade/calculate-final-course-grade",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "studentId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "subjectId",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.GradeCalculation.FinalsGradeController",
+    "Method": "GetCalculatedFinals",
+    "RelativePath": "api/FinalsGrade/finals-course-grade",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {

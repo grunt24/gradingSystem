@@ -25,6 +25,183 @@ public class GradeCalculationService : IGradeCalculationService
         _authRepository = authRepository;
     }
 
+    public async Task<FinalCourseGrade?> CalculateAndSaveFinalCourseGradeAsync(int studentId, int subjectId)
+    {
+        // ✅ Get current academic period
+        var currentPeriod = await _context.AcademicPeriods
+            .FirstOrDefaultAsync(p => p.IsCurrent);
+
+        if (currentPeriod == null)
+            throw new Exception("No active academic period found.");
+
+        // ✅ Get midterm grade
+        var midterm = await _context.MidtermGrades
+            .FirstOrDefaultAsync(x =>
+                x.StudentId == studentId &&
+                x.SubjectId == subjectId &&
+                x.AcademicPeriodId == currentPeriod.Id
+            );
+
+        // ✅ If no midterm or no value yet → STOP
+        if (midterm == null || midterm.TotalMidtermGrade <= 0)
+            return null;
+
+        // ✅ Get final grade
+        var final = await _context.FinalsGrades
+            .FirstOrDefaultAsync(x =>
+                x.StudentId == studentId &&
+                x.SubjectId == subjectId &&
+                x.AcademicPeriodId == currentPeriod.Id
+            );
+
+        // ✅ If no final or no value yet → STOP
+        if (final == null || final.TotalFinalsGrade <= 0)
+            return null;
+
+        decimal computedMidterm = (decimal)midterm.TotalMidtermGrade;
+        decimal computedFinal = (decimal)final.TotalFinalsGrade;
+
+        int roundedMidterm = (int)midterm.TotalMidtermGradeRounded;
+        int roundedFinal = (int)final.TotalFinalsGradeRounded;
+
+        // ✅ YOUR FORMULA (Midterm counted twice)
+        decimal computedFinalCourseGrade =
+            (computedMidterm + computedMidterm + computedFinal) / 3;
+
+        // ✅ Round to 2 decimal places
+        computedFinalCourseGrade = Math.Round(computedFinalCourseGrade, 2);
+
+        int roundedFinalCourseGrade = (int)Math.Round(computedFinalCourseGrade, 0);
+
+        // ✅ Check if FinalCourse already exists (CORRECT MATCHING)
+        var existing = await _context.FinalCourseGrades
+            .FirstOrDefaultAsync(x =>
+                x.StudentId == studentId &&
+                x.SubjectId == subjectId &&
+                x.AcademicYearId == currentPeriod.Id
+            );
+
+        if (existing == null)
+        {
+            var finalCourseGrade = new FinalCourseGrade
+            {
+                StudentId = studentId,
+                SubjectId = subjectId,
+
+                ComputedTotalMidtermGrade = computedMidterm,
+                RoundedTotalMidtermGrade = roundedMidterm,
+
+                ComputedTotalFinalGrade = computedFinal,
+                RoundedTotalFinalGrade = roundedFinal,
+
+                ComputedFinalCourseGrade = computedFinalCourseGrade,
+                RoundedFinalCourseGrade = roundedFinalCourseGrade,
+
+                AcademicYearId = currentPeriod.Id
+            };
+
+            await _context.FinalCourseGrades.AddAsync(finalCourseGrade);
+
+            await _context.SaveChangesAsync();
+
+            return finalCourseGrade;
+        }
+        else
+        {
+            existing.ComputedTotalMidtermGrade = computedMidterm;
+            existing.RoundedTotalMidtermGrade = roundedMidterm;
+
+            existing.ComputedTotalFinalGrade = computedFinal;
+            existing.RoundedTotalFinalGrade = roundedFinal;
+
+            existing.ComputedFinalCourseGrade = computedFinalCourseGrade;
+            existing.RoundedFinalCourseGrade = roundedFinalCourseGrade;
+
+            _context.FinalCourseGrades.Update(existing);
+
+            await _context.SaveChangesAsync();
+
+            return existing;
+        }
+    }
+    public async Task<List<FinalCourseGradeDto>> GetCalculatedFinalsGradesAsync()
+    {
+        var currentPeriod = await _context.AcademicPeriods
+            .FirstOrDefaultAsync(ap => ap.IsCurrent);
+
+        if (currentPeriod == null)
+            throw new Exception("No current academic period found.");
+
+        // Hard-coded grade scale
+        var gradeScale = new List<(decimal? Min, decimal Max, decimal Point)>
+    {
+        (98, 100, 1.0m),
+        (95, 97, 1.25m),
+        (92, 94, 1.5m),
+        (89, 91, 1.75m),
+        (86, 88, 2.0m),
+        (83, 85, 2.25m),
+        (80, 82, 2.5m),
+        (77, 79, 2.75m),
+        (75, 76, 3.0m),
+        (74, 74, 4.0m),
+        (null, 73, 5.0m) // Min is null for lowest range
+    };
+
+        // Fetch final course grades joined with Users
+        var finalsGrades = await (from fg in _context.FinalCourseGrades
+                                  join u in _context.Users on fg.StudentId equals u.Id
+                                  where fg.AcademicYearId == currentPeriod.Id
+                                  select new FinalCourseGradeDto
+                                  {
+                                      Id = fg.Id,
+                                      StudentId = fg.StudentId,
+                                      StudentName = u.Fullname,
+                                      SubjectId = fg.SubjectId,
+                                      RoundedTotalFinalGrade = fg.RoundedTotalFinalGrade,
+                                      ComputedTotalFinalGrade = fg.ComputedTotalFinalGrade,
+                                      RoundedTotalMidtermGrade = fg.RoundedTotalMidtermGrade,
+                                      ComputedTotalMidtermGrade = fg.ComputedTotalMidtermGrade,
+                                      ComputedFinalCourseGrade = fg.ComputedFinalCourseGrade,
+                                      RoundedFinalCourseGrade = fg.RoundedFinalCourseGrade,
+                                      GradePointEquivalent = 0 // placeholder
+                                  }).ToListAsync();
+
+        // Compute GradePointEquivalent
+        foreach (var grade in finalsGrades)
+        {
+            var matchingGrade = gradeScale.FirstOrDefault(g =>
+                (g.Min == null || grade.ComputedFinalCourseGrade >= g.Min.Value) &&
+                grade.ComputedFinalCourseGrade <= g.Max
+            );
+
+            // Check if matchingGrade is default tuple
+            if (matchingGrade != default)
+                grade.GradePointEquivalent = matchingGrade.Point;
+            else
+                grade.GradePointEquivalent = 5.0m;
+        }
+
+
+        return finalsGrades;
+    }
+
+
+
+    public class FinalCourseGradeDto
+    {
+        public int Id { get; set; }
+        public int StudentId { get; set; }
+        public string StudentName { get; set; }
+        public int SubjectId { get; set; }
+        public decimal ComputedTotalMidtermGrade { get; set; }
+        public int RoundedTotalMidtermGrade { get; set; }
+        public decimal ComputedTotalFinalGrade { get; set; }
+        public int RoundedTotalFinalGrade { get; set; }
+        public decimal ComputedFinalCourseGrade { get; set; }
+        public int RoundedFinalCourseGrade { get; set; }
+        public decimal GradePointEquivalent { get; set; }
+    }
 
 
     //Grade Weights
@@ -896,25 +1073,23 @@ public class GradeCalculationService : IGradeCalculationService
         return result;
     }
 
-    public async Task<FinalsGradeUploadResult> CalculateFinalsGradesForAllSubjectsAsync()
+    public async Task CalculateFinalsGradesForAllSubjectsAsync()
     {
-        var result = new FinalsGradeUploadResult();
-
         var gradeScale = await _context.GradePointEquivalents.ToListAsync();
         var weights = await _context.GradeWeights.FirstOrDefaultAsync();
 
         if (weights == null)
         {
-            result.Warnings.Add("Grade weights not found in the database.");
-            return result;
+            // Log warning or throw if needed
+            return;
         }
 
         // Get current academic period
         var currentPeriod = await _context.AcademicPeriods.FirstOrDefaultAsync(ap => ap.IsCurrent);
         if (currentPeriod == null)
         {
-            result.Warnings.Add("No current academic period found.");
-            return result;
+            // Log warning or throw if needed
+            return;
         }
 
         // Get all subjects
@@ -926,14 +1101,12 @@ public class GradeCalculationService : IGradeCalculationService
             var finalsGrades = await _context.FinalsGrades
                 .Include(f => f.Quizzes)
                 .Include(f => f.ClassStandingItems)
-                .Include(f => f.Subject)
-                .ThenInclude(s => s.Teacher)
                 .Where(f => f.SubjectId == subject.Id && f.AcademicPeriodId == currentPeriod.Id)
                 .ToListAsync();
 
             if (!finalsGrades.Any())
             {
-                result.Warnings.Add($"No finals grades found for subject {subject.SubjectName}.");
+                // Optionally log: No finals grades for this subject
                 continue;
             }
 
@@ -942,17 +1115,24 @@ public class GradeCalculationService : IGradeCalculationService
                 try
                 {
                     _calculateFinalGrade(grade, weights, gradeScale);
-                    result.CalculatedGrades.Add(grade);
+
+                    // Save per-student final course grade if needed
+                    await CalculateAndSaveFinalCourseGradeAsync(
+                        grade.StudentId,
+                        (int)grade.SubjectId
+                    );
+
+                    // Mark entity for update
+                    _context.FinalsGrades.Update(grade);
                 }
                 catch (Exception ex)
                 {
-                    result.Warnings.Add($"Failed to calculate finals grade for student ID {grade.StudentId} in {subject.SubjectName}: {ex.Message}");
+                    // Optionally log: Failed to calculate finals grade for this student
                 }
             }
         }
 
         await _context.SaveChangesAsync();
-        return result;
     }
 
     public async Task<MidtermGradeUploadResult> CalculateMidtermGradesForSubjectAsync(int subjectId, int academicPeriodId)

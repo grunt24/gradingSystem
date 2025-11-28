@@ -2,6 +2,7 @@
 using BackendApi.Core.Models;
 using BackendApi.Core.Models.Dto;
 using System.Threading.Tasks;
+using static GradeCalculationService;
 
 namespace BackendApi.IRepositories
 {
@@ -38,10 +39,13 @@ namespace BackendApi.IRepositories
 
         //
         Task<MidtermGradeUploadResult> CalculateMidtermGradesForAllSubjectsAsync();
-        Task<FinalsGradeUploadResult> CalculateFinalsGradesForAllSubjectsAsync();
+        Task CalculateFinalsGradesForAllSubjectsAsync();
+
         //11/10/2025
         Task BatchUpdateMidtermGradesAsync(List<MidtermGradeDto> grades);
         //11/10/2025
         Task<MidtermGradeUploadResult> CalculateMidtermGradesBySubjectAsync(int subjectId);
+        Task<FinalCourseGrade> CalculateAndSaveFinalCourseGradeAsync(int studentId, int subjectId);
+        Task<List<FinalCourseGradeDto>> GetCalculatedFinalsGradesAsync();
     }
 }

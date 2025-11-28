@@ -21,6 +21,12 @@ namespace BackendApi.Core.Models
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        public DateTime? MidtermSubmissionDate { get; set; }
+        public DateTime? FinalsSubmissionDate { get; set; }
+
+        public bool IsMidtermSubmissionOpen { get; set; }
+        public bool IsFinalsSubmissionOpen { get; set; }
+
         [NotMapped]
         public string AcademicYear => $"{StartYear}-{EndYear}";
     }

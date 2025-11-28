@@ -190,50 +190,123 @@ namespace BackendApi.Controllers
         [HttpPost("update")]
         public async Task<IActionResult> UpdateStudentSubjects([FromBody] UpdateStudentSubjectsDTO dto)
         {
-            // 1. Find student
+            // 1️⃣ Find student
             var student = await _context.Users.FindAsync(dto.StudentId);
             if (student == null)
                 return NotFound("Student not found.");
 
-            // 2. Get latest/current academic period
+            // 2️⃣ Get latest/current academic period
             var currentPeriod = await _context.AcademicPeriods
-                .FirstOrDefaultAsync(a => a.IsCurrent == true);
-
+                .FirstOrDefaultAsync(a => a.IsCurrent);
             if (currentPeriod == null)
                 return BadRequest("No active academic period found.");
 
-            // 3. Get selected curriculum subjects
+            // 3️⃣ Get selected curriculum subjects
             var curriculumSubjects = await _context.CurriculumSubjects
                 .Where(cs => dto.CurriculumSubjectIds.Contains(cs.Id))
                 .ToListAsync();
 
-            foreach (var cs in curriculumSubjects)
+            using var transaction = await _context.Database.BeginTransactionAsync();
+            try
             {
-                // Check if student already has this subject
-                var existing = await _context.StudentSubjects.FirstOrDefaultAsync(ss =>
-                    ss.StudentID == dto.StudentId &&
-                    ss.SubjectID == cs.SubjectId);
+                foreach (var cs in curriculumSubjects)
+                {
+                    // Check if Midterm or Finals already exist for this student, subject, and period
+                    var midtermExists = await _context.MidtermGrades.AnyAsync(m =>
+                        m.StudentId == dto.StudentId &&
+                        m.SubjectId == cs.SubjectId &&
+                        m.AcademicPeriodId == currentPeriod.Id
+                    );
 
-                if (existing != null)
-                {
-                    // ✅ UPDATE academic period only
-                    existing.AcademicPeriodId = currentPeriod.Id;
-                }
-                else
-                {
-                    // ✅ ADD new
-                    await _context.StudentSubjects.AddAsync(new StudentSubject
+                    var finalsExists = await _context.FinalsGrades.AnyAsync(f =>
+                        f.StudentId == dto.StudentId &&
+                        f.SubjectId == cs.SubjectId &&
+                        f.AcademicPeriodId == currentPeriod.Id
+                    );
+
+                    if (midtermExists || finalsExists)
+                    {
+                        return BadRequest($"Student already has grades for subject ID {cs.SubjectId} in the current academic period.");
+                    }
+
+                    // ✅ ADD new student-subject
+                    var studentSubject = new StudentSubject
                     {
                         StudentID = dto.StudentId,
                         SubjectID = cs.SubjectId,
                         AcademicPeriodId = currentPeriod.Id
-                    });
+                    };
+                    await _context.StudentSubjects.AddAsync(studentSubject);
+
+                    // 4️⃣ Create default MidtermGrade
+                    var midterm = new MidtermGrade
+                    {
+                        StudentId = dto.StudentId,
+                        SubjectId = cs.SubjectId,
+                        AcademicPeriodId = currentPeriod.Id,
+                        Semester = currentPeriod.Semester,
+                        AcademicYear = $"{currentPeriod.StartYear}-{currentPeriod.EndYear}",
+                        RecitationScore = 0,
+                        AttendanceScore = 0,
+                        SEPScore = 0,
+                        ProjectScore = 0,
+                        PrelimScore = 0,
+                        PrelimTotal = 0,
+                        MidtermScore = 0,
+                        MidtermTotal = 0,
+                        TotalMidtermGrade = 0,
+                        TotalMidtermGradeRounded = 0,
+                        GradePointEquivalent = 5
+                    };
+                    await _context.MidtermGrades.AddAsync(midterm);
+
+                    // 5️⃣ Create default FinalsGrade
+                    var finals = new FinalsGrade
+                    {
+                        StudentId = dto.StudentId,
+                        SubjectId = cs.SubjectId,
+                        AcademicPeriodId = currentPeriod.Id,
+                        Semester = currentPeriod.Semester,
+                        AcademicYear = $"{currentPeriod.StartYear}-{currentPeriod.EndYear}",
+                        RecitationScore = 0,
+                        AttendanceScore = 0,
+                        SEPScore = 0,
+                        ProjectScore = 0,
+                        FinalsScore = 0,
+                        FinalsTotal = 0,
+                        TotalQuizScore = 0,
+                        ClassStandingTotalScore = 0,
+                        ClassStandingAverage = 0,
+                        ClassStandingPG = 0,
+                        ClassStandingWeightedTotal = 0,
+                        QuizPG = 0,
+                        QuizWeightedTotal = 0,
+                        SEPPG = 0,
+                        SEPWeightedTotal = 0,
+                        ProjectPG = 0,
+                        ProjectWeightedTotal = 0,
+                        TotalScoreFinals = 0,
+                        OverallFinals = 0,
+                        CombinedFinalsAverage = 0,
+                        FinalsPG = 0,
+                        FinalsWeightedTotal = 0,
+                        TotalFinalsGrade = 0,
+                        TotalFinalsGradeRounded = 0,
+                        GradePointEquivalent = 5
+                    };
+                    await _context.FinalsGrades.AddAsync(finals);
                 }
+
+                await _context.SaveChangesAsync();
+                await transaction.CommitAsync();
+
+                return Ok("Student subjects and default grades successfully updated for current academic period.");
             }
-
-            await _context.SaveChangesAsync();
-
-            return Ok("Student subjects successfully updated for current academic period.");
+            catch
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         [HttpGet("curriculum")]
@@ -245,7 +318,7 @@ namespace BackendApi.Controllers
                 {
                     cs.Id,
                     cs.YearLevel,
-                    cs.Semester,
+                    Semester = char.ToUpper(cs.Semester[0]) + cs.Semester.Substring(1).ToLower(), // Pascal Case
                     SubjectId = cs.Subject.Id,
                     SubjectCode = cs.Subject.SubjectCode,
                     SubjectName = cs.Subject.SubjectName,
@@ -275,6 +348,7 @@ namespace BackendApi.Controllers
 
             return Ok(grouped);
         }
+
 
 
 

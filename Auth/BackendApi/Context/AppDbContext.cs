@@ -27,9 +27,7 @@ namespace BackendApi.Context
         public DbSet<AcademicPeriod> AcademicPeriods { get; set; }
         public DbSet<StudentEnrollment> StudentEnrollments { get; set; }
         public DbSet<CurriculumSubject> CurriculumSubjects { get; set; }
-        
-
-
+        public DbSet<FinalCourseGrade> FinalCourseGrades { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

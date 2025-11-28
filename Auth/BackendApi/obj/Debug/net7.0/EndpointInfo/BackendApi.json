@@ -103,6 +103,49 @@
         }
       }
     },
+    "/api/AcademicPeriods/grade-submission-status": {
+      "get": {
+        "tags": [
+          "AcademicPeriods"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/AcademicPeriods/update-submission-dates": {
+      "put": {
+        "tags": [
+          "AcademicPeriods"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubmissionDateDto"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubmissionDateDto"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSubmissionDateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/Auth/roles": {
       "get": {
         "tags": [
@@ -508,6 +551,50 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/FinalsGrade/calculate-final-course-grade": {
+      "post": {
+        "tags": [
+          "FinalsGrade"
+        ],
+        "parameters": [
+          {
+            "name": "studentId",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "subjectId",
+            "in": "query",
+            "style": "form",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/FinalsGrade/finals-course-grade": {
+      "get": {
+        "tags": [
+          "FinalsGrade"
+        ],
         "responses": {
           "200": {
             "description": "Success"
@@ -2156,6 +2243,22 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "midtermSubmissionDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "finalsSubmissionDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "isMidtermSubmissionOpen": {
+            "type": "boolean"
+          },
+          "isFinalsSubmissionOpen": {
+            "type": "boolean"
           },
           "academicYear": {
             "type": "string",
@@ -3821,6 +3924,28 @@
               "format": "int32"
             },
             "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdateSubmissionDateDto": {
+        "type": "object",
+        "properties": {
+          "midtermSubmissionDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "isMidtermSubmissionOpen": {
+            "type": "boolean"
+          },
+          "finalsSubmissionDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "isFinalsSubmissionOpen": {
+            "type": "boolean"
           }
         },
         "additionalProperties": false

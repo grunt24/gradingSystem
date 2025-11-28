@@ -1,5 +1,6 @@
 ﻿using BackendApi.Context;
 using BackendApi.Core.Models;
+using BackendApi.IRepositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +12,13 @@ namespace BackendApi.Controllers
     public class AcademicPeriodsController : ControllerBase
     {
         private readonly AppDbContext _dbContext;
+        private readonly IAuthRepository _authService;
 
-        public AcademicPeriodsController(AppDbContext dbContext)
+
+        public AcademicPeriodsController(AppDbContext dbContext, IAuthRepository authService)
         {
             _dbContext = dbContext;
+            _authService = authService;
         }
 
         [HttpGet("current")]
@@ -176,6 +180,116 @@ namespace BackendApi.Controllers
         //    return Ok(academicPeriods);
         //}
 
+        [HttpGet("grade-submission-status")]
+        public async Task<IActionResult> GetGradeSubmissionStatus()
+        {
+            var currentUser = await _authService.GetCurrentUserAsync();
+
+            if (currentUser == null || currentUser.Role == null)
+            {
+                return Ok(new
+                {
+                    isMidterm = false,
+                    isFinals = false,
+                    midtermMessage = (string?)null,
+                    finalsMessage = (string?)null,
+                    midtermDate = (DateTime?)null,
+                    finalsDate = (DateTime?)null
+                });
+            }
+
+            if (currentUser.Role != UserRole.Teacher && currentUser.Role != UserRole.Admin)
+            {
+                return Ok(new
+                {
+                    isMidterm = false,
+                    isFinals = false,
+                    midtermMessage = (string?)null,
+                    finalsMessage = (string?)null,
+                    midtermDate = (DateTime?)null,
+                    finalsDate = (DateTime?)null
+                });
+            }
+
+            var period = await _dbContext.AcademicPeriods
+                .FirstOrDefaultAsync(p => p.IsCurrent);
+
+            if (period == null)
+            {
+                return Ok(new
+                {
+                    isMidterm = false,
+                    isFinals = false,
+                    midtermMessage = (string?)null,
+                    finalsMessage = (string?)null,
+                    midtermDate = (DateTime?)null,
+                    finalsDate = (DateTime?)null
+                });
+            }
+
+            var today = DateTime.Today;
+
+            // Determine if a warning message should be shown today
+            bool isMidtermToday =
+                period.IsMidtermSubmissionOpen &&
+                period.MidtermSubmissionDate.HasValue &&
+                period.MidtermSubmissionDate.Value.Date == today;
+
+            bool isFinalsToday =
+                period.IsFinalsSubmissionOpen &&
+                period.FinalsSubmissionDate.HasValue &&
+                period.FinalsSubmissionDate.Value.Date == today;
+
+            return Ok(new
+            {
+                // always return whether the submission is open
+                isMidterm = period.IsMidtermSubmissionOpen,
+                isFinals = period.IsFinalsSubmissionOpen,
+
+                // show warning only if today matches
+                midtermMessage = isMidtermToday
+                    ? $"You need to input MIDTERM grades today ({today:MMMM dd, yyyy})"
+                    : null,
+
+                finalsMessage = isFinalsToday
+                    ? $"You need to input FINALS grades today ({today:MMMM dd, yyyy})"
+                    : null,
+
+                // always return the saved dates
+                midtermDate = period.MidtermSubmissionDate,
+                finalsDate = period.FinalsSubmissionDate
+            });
+        }
+
+
+
+        [HttpPut("update-submission-dates")]
+        public async Task<IActionResult> UpdateSubmissionDates([FromBody] UpdateSubmissionDateDto dto)
+        {
+            var period = await _dbContext.AcademicPeriods
+                .FirstOrDefaultAsync(p => p.IsCurrent);
+
+            if (period == null)
+                return NotFound("No current academic period found.");
+
+            period.MidtermSubmissionDate = dto.MidtermSubmissionDate?.Date; // keeps only the date part
+            period.FinalsSubmissionDate = dto.FinalsSubmissionDate?.Date;
+
+            period.IsMidtermSubmissionOpen = dto.IsMidtermSubmissionOpen;
+            period.IsFinalsSubmissionOpen = dto.IsFinalsSubmissionOpen;
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Submission dates updated successfully.",
+                period.MidtermSubmissionDate,
+                period.FinalsSubmissionDate
+            });
+        }
+
+
+
 
         public class AcademicPeriodDto
         {
@@ -183,5 +297,17 @@ namespace BackendApi.Controllers
             public int EndYear { get; set; }
             public string Semester { get; set; }
         }
+
+        public class UpdateSubmissionDateDto
+        {
+            public DateTime? MidtermSubmissionDate { get; set; }
+            public bool IsMidtermSubmissionOpen { get; set; }
+
+            public DateTime? FinalsSubmissionDate { get; set; }
+            public bool IsFinalsSubmissionOpen { get; set; }
+        }
+
+
+
     }
 }

@@ -37,5 +37,30 @@ namespace BackendApi.Controllers.GradeCalculation
 
             return Ok(new { message = "Finals grade updated successfully." });
         }
+
+        [HttpPost("calculate-final-course-grade")]
+        public async Task<IActionResult> CalculateFinal(int studentId, int subjectId)
+        {
+            var result = await _gradeCalculationService
+                .CalculateAndSaveFinalCourseGradeAsync(studentId, subjectId);
+
+            return Ok(result);
+        }
+
+        [HttpGet("finals-course-grade")]
+        public async Task<IActionResult> GetCalculatedFinals()
+        {
+            try
+            {
+                var result = await _gradeCalculationService.GetCalculatedFinalsGradesAsync();
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
     }
 }
