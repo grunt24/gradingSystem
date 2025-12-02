@@ -358,6 +358,72 @@ namespace BackendApi.Migrations
                     b.ToTable("FinalsGrades");
                 });
 
+            modelBuilder.Entity("BackendApi.Core.Models.GradeFormula", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int?>("AcademicPeriodId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("SubjectId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("YearLevel")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AcademicPeriodId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("GradeFormulas");
+                });
+
+            modelBuilder.Entity("BackendApi.Core.Models.GradeFormulaItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("ComponentName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("GradeFormulaId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("HasMultipleItems")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSubjectSpecific")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("ListTableName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SubjectType")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Weight")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GradeFormulaId");
+
+                    b.ToTable("GradeFormulaItems");
+                });
+
             modelBuilder.Entity("BackendApi.Core.Models.GradePointEquivalent", b =>
                 {
                     b.Property<int>("Id")
@@ -527,6 +593,30 @@ namespace BackendApi.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("MidtermGrades");
+                });
+
+            modelBuilder.Entity("BackendApi.Core.Models.PointGradeAverageFormula", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BasePoints")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("GradeFormulaId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("PercentageMultiplier")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GradeFormulaId");
+
+                    b.ToTable("PointGradeAverageFormulas");
                 });
 
             modelBuilder.Entity("BackendApi.Core.Models.QuizList", b =>
@@ -815,6 +905,32 @@ namespace BackendApi.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("BackendApi.Core.Models.GradeFormula", b =>
+                {
+                    b.HasOne("BackendApi.Core.Models.AcademicPeriod", "AcademicPeriod")
+                        .WithMany()
+                        .HasForeignKey("AcademicPeriodId");
+
+                    b.HasOne("BackendApi.Core.Models.Subject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId");
+
+                    b.Navigation("AcademicPeriod");
+
+                    b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("BackendApi.Core.Models.GradeFormulaItem", b =>
+                {
+                    b.HasOne("BackendApi.Core.Models.GradeFormula", "GradeFormula")
+                        .WithMany("Items")
+                        .HasForeignKey("GradeFormulaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GradeFormula");
+                });
+
             modelBuilder.Entity("BackendApi.Core.Models.MidtermGrade", b =>
                 {
                     b.HasOne("BackendApi.Core.Models.AcademicPeriod", "AcademicPeriod")
@@ -836,6 +952,17 @@ namespace BackendApi.Migrations
                     b.Navigation("Subject");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BackendApi.Core.Models.PointGradeAverageFormula", b =>
+                {
+                    b.HasOne("BackendApi.Core.Models.GradeFormula", "GradeFormula")
+                        .WithMany()
+                        .HasForeignKey("GradeFormulaId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("GradeFormula");
                 });
 
             modelBuilder.Entity("BackendApi.Core.Models.QuizList", b =>
@@ -931,6 +1058,11 @@ namespace BackendApi.Migrations
                     b.Navigation("ClassStandingItems");
 
                     b.Navigation("Quizzes");
+                });
+
+            modelBuilder.Entity("BackendApi.Core.Models.GradeFormula", b =>
+                {
+                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("BackendApi.Core.Models.MidtermGrade", b =>

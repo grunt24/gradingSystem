@@ -450,6 +450,16 @@ public class GradeCalculationService : IGradeCalculationService
 
         var gradesDto = _mapper.Map<List<MidtermGradeDto>>(studentsMidtermGrades);
 
+        foreach (var g in gradesDto)
+        {
+            if (g.Department?.Trim().ToUpper() != "BSED")
+            {
+                g.SEPScore = 0;
+                g.SEPWeighted = 0;
+                g.SEPPG = 0;
+            }
+        }
+
         return new ResponseData<IEnumerable<MidtermGradeDto>>
         {
             Data = gradesDto,
@@ -691,24 +701,48 @@ public class GradeCalculationService : IGradeCalculationService
         var tst = studentGrade.GradePointEquivalent;
     }
 
+
     private void _calculateMidtermGrade(MidtermGrade studentGrade, GradeWeights _weights, List<GradePointEquivalent> _gradeScale)
     {
-        // ===== Quizzes (30%) =====
+        // Get student info in one query
+        var studentInfo = _context.Users
+            .Where(s => s.Id == studentGrade.StudentId)
+            .Select(s => new { s.YearLevel, s.Department })
+            .FirstOrDefault();
+
+        var yearLevel = studentInfo?.YearLevel?.ToLower();
+        var department = studentInfo?.Department?.ToLower();
+
+        bool isUpperYear = yearLevel == "4th year" || yearLevel == "3rd year" || yearLevel == "2nd year";
+
+        // Decide normalization
+        Func<int, int, decimal> normalize = isUpperYear
+            ? NormalizeRawScoreFor2ndYearToFourthYear
+            : NormalizeRawScoreForFirstYear;
+
+        // Determine class standing weight (special rule for BSED)
+        decimal classStandingWeight = department == "bsed"
+            ? 0.25m
+            : 0.30m;
+
+        // ===== QUIZZES (30%) =====
         var totalQuizScore = studentGrade.Quizzes.Sum(q => q.QuizScore ?? 0);
         var totalQuizPossible = studentGrade.Quizzes.Sum(q => q.TotalQuizScore ?? 0);
         studentGrade.TotalQuizScore = totalQuizScore;
-        studentGrade.QuizPG = NormalizeRawScore(totalQuizScore, totalQuizPossible);
+        studentGrade.QuizPG = normalize(totalQuizScore, totalQuizPossible);
         studentGrade.QuizWeightedTotal = Math.Round(studentGrade.QuizPG * _weights.QuizWeighted, 2);
 
-        // ===== Class Standing (25%) =====
+        // ===== CLASS STANDING (25% or special) =====
         var totalCSScore = studentGrade.ClassStandingItems.Sum(cs => cs.Score ?? 0);
         var totalCSPossible = studentGrade.ClassStandingItems.Sum(cs => cs.Total ?? 0);
         studentGrade.ClassStandingTotalScore = totalCSPossible;
-        studentGrade.ClassStandingPG = NormalizeRawScore(totalCSScore, totalCSPossible);
 
-        decimal CSSAverage = Math.Round((studentGrade.RecitationScore + studentGrade.AttendanceScore + studentGrade.ClassStandingPG) / 3, 2);
-        studentGrade.ClassStandingAverage = CSSAverage;
-        studentGrade.ClassStandingWeightedTotal = Math.Round(CSSAverage * _weights.ClassStandingWeighted, 2);
+        studentGrade.ClassStandingPG = normalize(totalCSScore, totalCSPossible);
+        studentGrade.ClassStandingAverage = Math.Round(
+            (studentGrade.RecitationScore + studentGrade.AttendanceScore + studentGrade.ClassStandingPG) / 3, 2
+        );
+
+        studentGrade.ClassStandingWeightedTotal = Math.Round(studentGrade.ClassStandingAverage * classStandingWeight, 2);
 
         // ===== SEP (5%) =====
         studentGrade.SEPPG = studentGrade.SEPScore;
@@ -721,9 +755,17 @@ public class GradeCalculationService : IGradeCalculationService
         // ===== Prelim + Midterm Combined (30%) =====
         studentGrade.TotalScorePerlimAndMidterm = studentGrade.PrelimScore + studentGrade.MidtermScore;
         studentGrade.OverallPrelimAndMidterm = studentGrade.PrelimTotal + studentGrade.MidtermTotal;
-        studentGrade.CombinedPrelimMidtermAverage = NormalizeRawScore((int)studentGrade.TotalScorePerlimAndMidterm, (int)studentGrade.OverallPrelimAndMidterm);
+
+        studentGrade.CombinedPrelimMidtermAverage = normalize(
+            (int)studentGrade.TotalScorePerlimAndMidterm,
+            (int)studentGrade.OverallPrelimAndMidterm
+        );
+
         studentGrade.MidtermPG = studentGrade.CombinedPrelimMidtermAverage;
-        studentGrade.MidtermWeightedTotal = Math.Round(studentGrade.MidtermPG * _weights.MidtermWeighted, 2, MidpointRounding.AwayFromZero);
+        studentGrade.MidtermWeightedTotal = Math.Round(
+            studentGrade.MidtermPG * _weights.MidtermWeighted,
+            2, MidpointRounding.AwayFromZero
+        );
 
         // ===== Total Midterm Grade =====
         studentGrade.TotalMidtermGrade = Math.Round(
@@ -736,7 +778,11 @@ public class GradeCalculationService : IGradeCalculationService
             ),
             2, MidpointRounding.AwayFromZero
         );
-        studentGrade.TotalMidtermGradeRounded = Math.Round(studentGrade.TotalMidtermGrade, 0, MidpointRounding.AwayFromZero);
+
+        studentGrade.TotalMidtermGradeRounded = Math.Round(
+            studentGrade.TotalMidtermGrade,
+            0, MidpointRounding.AwayFromZero
+        );
 
         // ===== Grade Point Equivalent =====
         if (studentGrade.TotalMidtermGradeRounded <= 73)
@@ -754,72 +800,304 @@ public class GradeCalculationService : IGradeCalculationService
     }
 
 
-    //private void _calculateMidtermGrade(MidtermGrade studentGrade, GradeWeights _weights, List<GradePointEquivalent> _gradeScale)
+    //    private void _calculateMidtermGrade(MidtermGrade studentGrade, GradeWeights _weights, List<GradePointEquivalent> _gradeScale)
+    //    {
+
+    //        var yearLevel = _context.Users
+    //    .Where(s => s.Id == studentGrade.StudentId)
+    //    .Select(s => s.YearLevel)
+    //    .FirstOrDefault();
+
+    //        var department = _context.Users
+    //.Where(s => s.Id == studentGrade.StudentId)
+    //.Select(s => s.Department)
+    //.FirstOrDefault();
+
+    //        var studentYearLevel = yearLevel?.ToLower();
+
+    //        if (studentYearLevel == "4th year" || studentYearLevel == "3rd year" || studentYearLevel == "2nd year")
+    //        {
+    //            // ===== Quizzes (30%) =====
+    //            var totalQuizScore = studentGrade.Quizzes.Sum(q => q.QuizScore ?? 0);
+    //            var totalQuizPossible = studentGrade.Quizzes.Sum(q => q.TotalQuizScore ?? 0);
+    //            studentGrade.TotalQuizScore = totalQuizScore;
+    //            studentGrade.QuizPG = NormalizeRawScoreFor2ndYearToFourthYear(totalQuizScore, totalQuizPossible);
+    //            studentGrade.QuizWeightedTotal = Math.Round(studentGrade.QuizPG * _weights.QuizWeighted, 2);
+
+    //            // ===== Class Standing (25%) =====
+    //            var totalCSScore = studentGrade.ClassStandingItems.Sum(cs => cs.Score ?? 0);
+    //            var totalCSPossible = studentGrade.ClassStandingItems.Sum(cs => cs.Total ?? 0);
+    //            studentGrade.ClassStandingTotalScore = totalCSPossible;
+    //            studentGrade.ClassStandingPG = NormalizeRawScoreFor2ndYearToFourthYear(totalCSScore, totalCSPossible);
+
+    //            decimal CSSAverage = Math.Round((studentGrade.RecitationScore + studentGrade.AttendanceScore + studentGrade.ClassStandingPG) / 3, 2);
+    //            studentGrade.ClassStandingAverage = CSSAverage;
+    //            studentGrade.ClassStandingWeightedTotal = Math.Round(CSSAverage * _weights.ClassStandingWeighted, 2);
+
+    //            // ===== SEP (5%) =====
+    //            studentGrade.SEPPG = studentGrade.SEPScore;
+    //            studentGrade.SEPWeightedTotal = Math.Round(studentGrade.SEPPG * _weights.SEPWeighted, 2);
+
+    //            // ===== Project (10%) =====
+    //            studentGrade.ProjectPG = studentGrade.ProjectScore;
+    //            studentGrade.ProjectWeightedTotal = Math.Round(studentGrade.ProjectPG * _weights.ProjectWeighted, 2);
+
+    //            // ===== Prelim + Midterm Combined (30%) =====
+    //            studentGrade.TotalScorePerlimAndMidterm = studentGrade.PrelimScore + studentGrade.MidtermScore;
+    //            studentGrade.OverallPrelimAndMidterm = studentGrade.PrelimTotal + studentGrade.MidtermTotal;
+    //            studentGrade.CombinedPrelimMidtermAverage = NormalizeRawScoreFor2ndYearToFourthYear((int)studentGrade.TotalScorePerlimAndMidterm, (int)studentGrade.OverallPrelimAndMidterm);
+    //            studentGrade.MidtermPG = studentGrade.CombinedPrelimMidtermAverage;
+    //            studentGrade.MidtermWeightedTotal = Math.Round(studentGrade.MidtermPG * _weights.MidtermWeighted, 2, MidpointRounding.AwayFromZero);
+
+    //            // ===== Total Midterm Grade =====
+    //            studentGrade.TotalMidtermGrade = Math.Round(
+    //                (double)(
+    //                    studentGrade.QuizWeightedTotal +
+    //                    studentGrade.ClassStandingWeightedTotal +
+    //                    studentGrade.SEPWeightedTotal +
+    //                    studentGrade.ProjectWeightedTotal +
+    //                    studentGrade.MidtermWeightedTotal
+    //                ),
+    //                2, MidpointRounding.AwayFromZero
+    //            );
+    //            studentGrade.TotalMidtermGradeRounded = Math.Round(studentGrade.TotalMidtermGrade, 0, MidpointRounding.AwayFromZero);
+
+    //            // ===== Grade Point Equivalent =====
+    //            if (studentGrade.TotalMidtermGradeRounded <= 73)
+    //            {
+    //                studentGrade.GradePointEquivalent = 5.00;
+    //            }
+    //            else
+    //            {
+    //                var match = _gradeScale.FirstOrDefault(gp =>
+    //                    (!gp.MinPercentage.HasValue || studentGrade.TotalMidtermGradeRounded >= gp.MinPercentage.Value) &&
+    //                    studentGrade.TotalMidtermGradeRounded <= gp.MaxPercentage
+    //                );
+    //                studentGrade.GradePointEquivalent = match?.GradePoint ?? 5.00;
+    //            }
+    //        }
+    //        else
+    //        {
+    //            // ===== Quizzes (30%) =====
+    //            var totalQuizScore = studentGrade.Quizzes.Sum(q => q.QuizScore ?? 0);
+    //            var totalQuizPossible = studentGrade.Quizzes.Sum(q => q.TotalQuizScore ?? 0);
+    //            studentGrade.TotalQuizScore = totalQuizScore;
+    //            studentGrade.QuizPG = NormalizeRawScoreForFirstYear(totalQuizScore, totalQuizPossible);
+    //            studentGrade.QuizWeightedTotal = Math.Round(studentGrade.QuizPG * _weights.QuizWeighted, 2);
+
+    //            // ===== Class Standing (25%) =====
+    //            var totalCSScore = studentGrade.ClassStandingItems.Sum(cs => cs.Score ?? 0);
+    //            var totalCSPossible = studentGrade.ClassStandingItems.Sum(cs => cs.Total ?? 0);
+    //            studentGrade.ClassStandingTotalScore = totalCSPossible;
+    //            studentGrade.ClassStandingPG = NormalizeRawScoreForFirstYear(totalCSScore, totalCSPossible);
+
+    //            decimal CSSAverage = Math.Round((studentGrade.RecitationScore + studentGrade.AttendanceScore + studentGrade.ClassStandingPG) / 3, 2);
+    //            studentGrade.ClassStandingAverage = CSSAverage;
+    //            studentGrade.ClassStandingWeightedTotal = Math.Round(CSSAverage * _weights.ClassStandingWeighted, 2);
+
+    //            // ===== SEP (5%) =====
+    //            studentGrade.SEPPG = studentGrade.SEPScore;
+    //            studentGrade.SEPWeightedTotal = Math.Round(studentGrade.SEPPG * _weights.SEPWeighted, 2);
+
+    //            // ===== Project (10%) =====
+    //            studentGrade.ProjectPG = studentGrade.ProjectScore;
+    //            studentGrade.ProjectWeightedTotal = Math.Round(studentGrade.ProjectPG * _weights.ProjectWeighted, 2);
+
+    //            // ===== Prelim + Midterm Combined (30%) =====
+    //            studentGrade.TotalScorePerlimAndMidterm = studentGrade.PrelimScore + studentGrade.MidtermScore;
+    //            studentGrade.OverallPrelimAndMidterm = studentGrade.PrelimTotal + studentGrade.MidtermTotal;
+    //            studentGrade.CombinedPrelimMidtermAverage = NormalizeRawScoreForFirstYear((int)studentGrade.TotalScorePerlimAndMidterm, (int)studentGrade.OverallPrelimAndMidterm);
+    //            studentGrade.MidtermPG = studentGrade.CombinedPrelimMidtermAverage;
+    //            studentGrade.MidtermWeightedTotal = Math.Round(studentGrade.MidtermPG * _weights.MidtermWeighted, 2, MidpointRounding.AwayFromZero);
+
+    //            // ===== Total Midterm Grade =====
+    //            studentGrade.TotalMidtermGrade = Math.Round(
+    //                (double)(
+    //                    studentGrade.QuizWeightedTotal +
+    //                    studentGrade.ClassStandingWeightedTotal +
+    //                    studentGrade.SEPWeightedTotal +
+    //                    studentGrade.ProjectWeightedTotal +
+    //                    studentGrade.MidtermWeightedTotal
+    //                ),
+    //                2, MidpointRounding.AwayFromZero
+    //            );
+    //            studentGrade.TotalMidtermGradeRounded = Math.Round(studentGrade.TotalMidtermGrade, 0, MidpointRounding.AwayFromZero);
+
+    //            // ===== Grade Point Equivalent =====
+    //            if (studentGrade.TotalMidtermGradeRounded <= 73)
+    //            {
+    //                studentGrade.GradePointEquivalent = 5.00;
+    //            }
+    //            else
+    //            {
+    //                var match = _gradeScale.FirstOrDefault(gp =>
+    //                    (!gp.MinPercentage.HasValue || studentGrade.TotalMidtermGradeRounded >= gp.MinPercentage.Value) &&
+    //                    studentGrade.TotalMidtermGradeRounded <= gp.MaxPercentage
+    //                );
+    //                studentGrade.GradePointEquivalent = match?.GradePoint ?? 5.00;
+    //            }
+    //        }
+
+
+    //    }
+
+    private decimal ComputePG(int scored, int possible, PointGradeAverageFormula pgf)
+    {
+        if (possible == 0) return 0;
+
+        return Math.Round(
+            ((decimal)scored / possible) * pgf.PercentageMultiplier + pgf.BasePoints,
+            2,
+            MidpointRounding.AwayFromZero
+        );
+    }
+
+    //private void CalculateMidtermGradeDynamic(
+    //    MidtermGrade studentGrade,
+    //    GradeFormula formula,
+    //    PointGradeAverageFormula pgf,   // main PGF for this formula
+    //    List<GradePointEquivalent> gradeScale)
     //{
-    //    // ===== Quizzes (30%) =====
-    //    var totalQuizScore = studentGrade.Quizzes.Sum(q => q.QuizScore ?? 0);
-    //    var totalQuizPossible = studentGrade.Quizzes.Sum(q => q.TotalQuizScore ?? 0);
-    //    studentGrade.TotalQuizScore = totalQuizScore;
-    //    studentGrade.QuizPG = totalQuizPossible > 0
-    //        ? Math.Round((decimal)totalQuizScore / totalQuizPossible * 70 + 30, 2)
-    //        : 0;
-    //    studentGrade.QuizWeightedTotal = Math.Round(studentGrade.QuizPG * _weights.QuizWeighted, 2);
+    //    decimal totalWeighted = 0;
 
-    //    // ===== Class Standing (25%) =====
-    //    var totalCSPossible = studentGrade.ClassStandingItems.Sum(cs => cs.Total ?? 0);
-    //    var totalCSScore = studentGrade.ClassStandingItems.Sum(cs => cs.Score ?? 0);
-    //    studentGrade.ClassStandingTotalScore = totalCSPossible;
-    //    studentGrade.ClassStandingPG = totalCSPossible > 0
-    //        ? Math.Round((decimal)totalCSScore / totalCSPossible * 70 + 30, 2) : 0;
+    //    foreach (var item in formula.Items)
+    //    {
+    //        switch (item.ComponentName)
+    //        {
+    //            case "QuizList":
+    //                {
+    //                    var scored = studentGrade.Quizzes.Sum(q => q.QuizScore ?? 0);
+    //                    var possible = studentGrade.Quizzes.Sum(q => q.TotalQuizScore ?? 0);
 
-    //    decimal CSSAverage = Math.Round((studentGrade.RecitationScore + studentGrade.AttendanceScore + studentGrade.ClassStandingPG) / 3, 2);
+    //                    studentGrade.QuizPG = ComputePG(scored, possible, pgf);
+    //                    studentGrade.QuizWeightedTotal = Math.Round(studentGrade.QuizPG * item.Weight, 2);
 
-    //    studentGrade.ClassStandingAverage = CSSAverage;
-    //    studentGrade.ClassStandingWeightedTotal = Math.Round(studentGrade.ClassStandingAverage * _weights.ClassStandingWeighted, 2);
+    //                    totalWeighted += studentGrade.QuizWeightedTotal;
+    //                    break;
+    //                }
 
-    //    // ===== SEP (5%) =====
-    //    studentGrade.SEPPG = studentGrade.SEPScore;
-    //    studentGrade.SEPWeightedTotal = Math.Round(studentGrade.SEPPG * _weights.SEPWeighted, 2);
+    //            case "ClassStanding":
+    //                {
+    //                    // ---------------------------------------
+    //                    // Determine the correct PGF to use
+    //                    // ---------------------------------------
+    //                    PointGradeAverageFormula pgFormulaToUse;
 
-    //    // ===== Project (10%) =====
-    //    studentGrade.ProjectPG = studentGrade.ProjectScore;
-    //    studentGrade.ProjectWeightedTotal = Math.Round(studentGrade.ProjectPG * _weights.ProjectWeighted, 2);
+    //                    if (item.IsSubjectSpecific)
+    //                    {
+    //                        // Subject-specific → fetch PGF tied to THIS formula item
+    //                        pgFormulaToUse = _context.PointGradeAverageFormulas
+    //                            .FirstOrDefault(p => p.GradeFormulaId == item.GradeFormulaId);
+    //                    }
+    //                    else
+    //                    {
+    //                        // Non subject-specific → use the PGF passed into function
+    //                        pgFormulaToUse = pgf;
+    //                    }
 
-    //    // ===== Prelim + Midterm Combined (30%) =====
-    //    studentGrade.TotalScorePerlimAndMidterm = studentGrade.PrelimScore + studentGrade.MidtermScore;
-    //    studentGrade.OverallPrelimAndMidterm = studentGrade.PrelimTotal + studentGrade.MidtermTotal;
-    //    studentGrade.CombinedPrelimMidtermAverage = studentGrade.OverallPrelimAndMidterm > 0
-    //        ? Math.Round(((decimal)studentGrade.TotalScorePerlimAndMidterm / studentGrade.OverallPrelimAndMidterm * 70) + 30, 2)
-    //        : 0;
-    //    studentGrade.MidtermPG = studentGrade.CombinedPrelimMidtermAverage;
-    //    var midTermPg = studentGrade.MidtermPG;
-    //    studentGrade.MidtermWeightedTotal = Math.Round(studentGrade.MidtermPG * _weights.MidtermWeighted, 2, MidpointRounding.AwayFromZero);
+    //                    // Fallback if somehow still null
+    //                    if (pgFormulaToUse == null)
+    //                        pgFormulaToUse = pgf;
 
-    //    // ===== Total Midterm Grade =====
-    //    studentGrade.TotalMidtermGrade = Math.Round(
-    //        (double)(studentGrade.QuizWeightedTotal +
-    //                 studentGrade.ClassStandingWeightedTotal +
-    //                 studentGrade.SEPWeightedTotal +
-    //                 studentGrade.ProjectWeightedTotal +
-    //                 studentGrade.MidtermWeightedTotal),
-    //        2, MidpointRounding.AwayFromZero
-    //    );
-    //    studentGrade.TotalMidtermGradeRounded = Math.Round(studentGrade.TotalMidtermGrade, 0, MidpointRounding.AwayFromZero);
 
-    //    // ===== Grade Point Equivalent =====
+    //                    // ---------------------------------------
+    //                    // Compute Class Standing totals
+    //                    // ---------------------------------------
+    //                    var totalCSScore = studentGrade.ClassStandingItems.Sum(cs => cs.Score ?? 0);
+    //                    var totalCSPossible = studentGrade.ClassStandingItems.Sum(cs => cs.Total ?? 0);
+
+    //                    studentGrade.ClassStandingTotalScore = totalCSPossible;
+
+    //                    // Convert to PG using selected PGF
+    //                    studentGrade.ClassStandingPG = ComputePGF(
+    //                        totalCSScore,
+    //                        totalCSPossible,
+    //                        pgFormulaToUse
+    //                    );
+
+    //                    // 3-component average
+    //                    decimal CSSAverage = Math.Round(
+    //                        (studentGrade.RecitationScore
+    //                        + studentGrade.AttendanceScore
+    //                        + studentGrade.ClassStandingPG) / 3,
+    //                        2
+    //                    );
+
+    //                    studentGrade.ClassStandingAverage = CSSAverage;
+
+    //                    // Weighted
+    //                    studentGrade.ClassStandingWeightedTotal =
+    //                        Math.Round(CSSAverage * item.Weight, 2);
+
+    //                    totalWeighted += studentGrade.ClassStandingWeightedTotal;
+
+    //                    break;
+    //                }
+
+    //            case "SEP":
+    //                {
+    //                    studentGrade.SEPPG = studentGrade.SEPScore;
+    //                    studentGrade.SEPWeightedTotal =
+    //                        Math.Round(studentGrade.SEPPG * item.Weight, 2);
+
+    //                    totalWeighted += studentGrade.SEPWeightedTotal;
+    //                    break;
+    //                }
+
+    //            case "Project":
+    //                {
+    //                    studentGrade.ProjectPG = studentGrade.ProjectScore;
+    //                    studentGrade.ProjectWeightedTotal =
+    //                        Math.Round(studentGrade.ProjectPG * item.Weight, 2);
+
+    //                    totalWeighted += studentGrade.ProjectWeightedTotal;
+    //                    break;
+    //                }
+
+    //            case "Exam":
+    //                {
+    //                    var scored = studentGrade.PrelimScore + studentGrade.MidtermScore;
+    //                    var possible = studentGrade.PrelimTotal + studentGrade.MidtermTotal;
+
+    //                    studentGrade.MidtermPG = ComputePG(scored, possible, pgf);
+    //                    studentGrade.MidtermWeightedTotal =
+    //                        Math.Round(studentGrade.MidtermPG * item.Weight, 2);
+
+    //                    totalWeighted += studentGrade.MidtermWeightedTotal;
+    //                    break;
+    //                }
+
+    //            default:
+    //                {
+    //                    // Future dynamic components go here
+    //                    break;
+    //                }
+    //        }
+    //    }
+
+    //    // FINAL GRADE
+    //    studentGrade.TotalMidtermGrade = Math.Round((double)totalWeighted, 2);
+
+    //    studentGrade.TotalMidtermGradeRounded =
+    //        Math.Round(studentGrade.TotalMidtermGrade, 0, MidpointRounding.AwayFromZero);
+
+    //    // GRADE POINT EQUIVALENT
     //    if (studentGrade.TotalMidtermGradeRounded <= 73)
     //    {
     //        studentGrade.GradePointEquivalent = 5.00;
     //    }
     //    else
     //    {
-    //        var match = _gradeScale.FirstOrDefault(gp =>
-    //            (!gp.MinPercentage.HasValue || studentGrade.TotalMidtermGradeRounded >= gp.MinPercentage.Value) &&
-    //            studentGrade.TotalMidtermGradeRounded <= gp.MaxPercentage
+    //        var match = gradeScale.FirstOrDefault(gp =>
+    //            (!gp.MinPercentage.HasValue ||
+    //             studentGrade.TotalMidtermGradeRounded >= gp.MinPercentage.Value) &&
+    //             studentGrade.TotalMidtermGradeRounded <= gp.MaxPercentage
     //        );
+
     //        studentGrade.GradePointEquivalent = match?.GradePoint ?? 5.00;
     //    }
     //}
+
 
     public async Task<bool> AddQuizToMidtermGradeAsync(int studentId, int gradeId, string label, int score, int total)
     {
@@ -864,10 +1142,32 @@ public class GradeCalculationService : IGradeCalculationService
         return true;
     }
 
-    private decimal NormalizeRawScore(int scored, int possible)
+    private decimal NormalizeRawScoreForFirstYear(int scored, int possible)
     {
+        PointGradeAverageFormula pointGradeAverageFormula = new PointGradeAverageFormula();
+
+
         if (possible == 0) return 0;
         return Math.Round(((decimal)scored / possible) * 70 + 30, 2);
+    }
+    private decimal NormalizeRawScoreFor2ndYearToFourthYear(int scored, int possible)
+    {
+        PointGradeAverageFormula pointGradeAverageFormula = new PointGradeAverageFormula();
+
+
+        if (possible == 0) return 0;
+        return Math.Round(((decimal)scored / possible) * 50 + 50, 2);
+    }
+
+    private decimal ComputePGF(int scored, int possible, PointGradeAverageFormula pgf)
+    {
+        if (possible == 0 || pgf == null)
+            return 0;
+
+        return Math.Round(
+            ((decimal)scored / possible) * pgf.PercentageMultiplier + pgf.BasePoints,
+            2
+        );
     }
 
     public async Task<MidtermGradeUploadResult> CalculateMidtermGradesForAllSubjectsAsync()
@@ -926,6 +1226,132 @@ public class GradeCalculationService : IGradeCalculationService
         await _context.SaveChangesAsync();
         return result;
     }
+
+    //public async Task<MidtermGradeUploadResult> CalculateMidtermGradesForAllSubjectsAsync()
+    //{
+    //    var result = new MidtermGradeUploadResult();
+
+    //    var gradeScale = await _context.GradePointEquivalents.ToListAsync();
+    //    var formulas = await _context.GradeFormulas.Include(f => f.Items).ToListAsync();
+    //    var pgfList = await _context.PointGradeAverageFormulas.ToListAsync();
+
+    //    if (!formulas.Any())
+    //    {
+    //        result.Warnings.Add("No grade formulas found in the database.");
+    //        return result;
+    //    }
+
+    //    var currentPeriod = await _context.AcademicPeriods.FirstOrDefaultAsync(ap => ap.IsCurrent);
+    //    if (currentPeriod == null)
+    //    {
+    //        result.Warnings.Add("No current academic period found.");
+    //        return result;
+    //    }
+
+    //    var subjects = await _context.Subjects.ToListAsync();
+
+    //    // --- Normalize Year Level ---
+    //    string Normalize(string? year)
+    //    {
+    //        if (string.IsNullOrWhiteSpace(year)) return "";
+    //        year = year.ToLower();
+
+    //        year = year.Replace("year", "")
+    //                   .Replace("first", "1")
+    //                   .Replace("second", "2")
+    //                   .Replace("third", "3")
+    //                   .Replace("fourth", "4")
+    //                   .Replace("st", "")
+    //                   .Replace("nd", "")
+    //                   .Replace("rd", "")
+    //                   .Replace("th", "")
+    //                   .Trim();
+
+    //        return new string(year.Where(char.IsDigit).ToArray());
+    //    }
+
+    //    foreach (var subject in subjects)
+    //    {
+    //        // Load midterm grades for this subject
+    //        var midtermGrades = await _context.MidtermGrades
+    //            .Include(mg => mg.User)
+    //            .Include(mg => mg.Quizzes)
+    //            .Include(mg => mg.ClassStandingItems)
+    //            .Where(mg => mg.SubjectId == subject.Id && mg.AcademicPeriodId == currentPeriod.Id)
+    //            .ToListAsync();
+
+    //        if (!midtermGrades.Any())
+    //            continue;
+
+    //        foreach (var grade in midtermGrades)
+    //        {
+    //            try
+    //            {
+    //                var studentYear = Normalize(grade.User?.YearLevel);
+
+    //                // 🎯 Select formula PER STUDENT (fixes your warnings)
+    //                var formula = formulas.FirstOrDefault(f =>
+    //                    f.IsActive &&
+    //                    f.AcademicPeriodId == currentPeriod.Id &&
+    //                    (f.SubjectId == null || f.SubjectId == subject.Id) &&
+    //                    (
+    //                        // 1st year → must use 1st-year formula
+    //                        (studentYear == "1" && Normalize(f.YearLevel) == "1") ||
+
+    //                        // 2nd–4th → must NOT use 1st-year formula
+    //                        (studentYear != "1" && Normalize(f.YearLevel) != "1")
+    //                    )
+    //                );
+
+    //                if (formula == null)
+    //                {
+    //                    result.Warnings.Add(
+    //                        $"No valid formula found for {grade.User?.YearLevel} student {grade.StudentId} (Subject {subject.SubjectName})."
+    //                    );
+    //                    continue;
+    //                }
+
+    //                // Match PGF
+    //                var pgf = pgfList.FirstOrDefault(p => p.GradeFormulaId == formula.Id);
+    //                if (pgf == null)
+    //                {
+    //                    result.Warnings.Add($"No PGF found for formula {formula.Id} (Subject {subject.SubjectName}).");
+    //                    continue;
+    //                }
+
+    //                // Apply BSED special rule (SEP)
+    //                FilterFormulaItemsForDepartment(formula, subject);
+
+    //                // Compute midterm grade
+    //                CalculateMidtermGradeDynamic(grade, formula, pgf, gradeScale);
+
+    //                result.CalculatedGrades.Add(grade);
+    //            }
+    //            catch (Exception ex)
+    //            {
+    //                result.Warnings.Add(
+    //                    $"Failed to calculate grade for Student {grade.StudentId}: {ex.Message}"
+    //                );
+    //            }
+    //        }
+    //    }
+
+    //    await _context.SaveChangesAsync();
+    //    return result;
+    //}
+
+    private void FilterFormulaItemsForDepartment(GradeFormula formula, Subject subject)
+    {
+        // SEP applies ONLY to BSED
+        if (subject.Department != "BSED")
+        {
+            formula.Items = formula.Items
+                .Where(i => i.ComponentName != "SEP")
+                .ToList();
+        }
+    }
+
+
     //11/10/2025
     public async Task BatchUpdateMidtermGradesAsync(List<MidtermGradeDto> grades)
     {
@@ -943,6 +1369,9 @@ public class GradeCalculationService : IGradeCalculationService
 
         foreach (var gradeDto in grades)
         {
+
+            
+
             var existingGrade = existingGrades.FirstOrDefault(g => g.Id == gradeDto.Id);
             if (existingGrade == null) continue;
 
@@ -959,7 +1388,7 @@ public class GradeCalculationService : IGradeCalculationService
             // Update all calculated fields
             existingGrade.TotalQuizScore = gradeDto.TotalQuizScore;
             existingGrade.QuizPG = gradeDto.QuizPG;
-            existingGrade.QuizWeightedTotal = gradeDto.QuizWeighted;
+            existingGrade.QuizWeightedTotal = gradeDto.QuizWeightedTotal;
 
             existingGrade.ClassStandingTotalScore = gradeDto.ClassStandingTotalScore;
             existingGrade.ClassStandingAverage = gradeDto.ClassStandingAverage;
@@ -1135,94 +1564,94 @@ public class GradeCalculationService : IGradeCalculationService
         await _context.SaveChangesAsync();
     }
 
-    public async Task<MidtermGradeUploadResult> CalculateMidtermGradesForSubjectAsync(int subjectId, int academicPeriodId)
-    {
-        var result = new MidtermGradeUploadResult();
+    //public async Task<MidtermGradeUploadResult> CalculateMidtermGradesForSubjectAsync(int subjectId, int academicPeriodId)
+    //{
+    //    var result = new MidtermGradeUploadResult();
 
-        var gradeScale = await _context.GradePointEquivalents.ToListAsync();
-        var weights = await _context.GradeWeights.FirstOrDefaultAsync();
+    //    var gradeScale = await _context.GradePointEquivalents.ToListAsync();
+    //    var weights = await _context.GradeWeights.FirstOrDefaultAsync();
 
-        if (weights == null)
-        {
-            result.Warnings.Add("Grade weights not found in the database.");
-            return result;
-        }
+    //    if (weights == null)
+    //    {
+    //        result.Warnings.Add("Grade weights not found in the database.");
+    //        return result;
+    //    }
 
-        // Get all midterm grades for the given subject and period
-        var midtermGrades = await _context.MidtermGrades
-            .Include(mg => mg.Quizzes)
-            .Include(mg => mg.ClassStandingItems)
-            .Where(mg => mg.SubjectId == subjectId && mg.AcademicPeriodId == academicPeriodId)
-            .ToListAsync();
+    //    // Get all midterm grades for the given subject and period
+    //    var midtermGrades = await _context.MidtermGrades
+    //        .Include(mg => mg.Quizzes)
+    //        .Include(mg => mg.ClassStandingItems)
+    //        .Where(mg => mg.SubjectId == subjectId && mg.AcademicPeriodId == academicPeriodId)
+    //        .ToListAsync();
 
-        if (!midtermGrades.Any())
-        {
-            result.Warnings.Add("No midterm grade records found for the specified subject and academic period.");
-            return result;
-        }
+    //    if (!midtermGrades.Any())
+    //    {
+    //        result.Warnings.Add("No midterm grade records found for the specified subject and academic period.");
+    //        return result;
+    //    }
 
-        foreach (var grade in midtermGrades)
-        {
-            try
-            {
-                _calculateMidtermGrade(grade, weights, gradeScale);
-                result.CalculatedGrades.Add(grade);
-            }
-            catch (Exception ex)
-            {
-                result.Warnings.Add($"Failed to calculate grade for student ID {grade.StudentId}: {ex.Message}");
-            }
-        }
+    //    foreach (var grade in midtermGrades)
+    //    {
+    //        try
+    //        {
+    //            _calculateMidtermGrade(grade, weights, gradeScale);
+    //            result.CalculatedGrades.Add(grade);
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            result.Warnings.Add($"Failed to calculate grade for student ID {grade.StudentId}: {ex.Message}");
+    //        }
+    //    }
 
-        await _context.SaveChangesAsync();
-        return result;
-    }
+    //    await _context.SaveChangesAsync();
+    //    return result;
+    //}
 
     //Finals
-    public async Task<FinalsGradeUploadResult> CalculateFinalsGradesForSubjectAsync(int subjectId, int academicPeriodId)
-    {
-        var result = new FinalsGradeUploadResult();
+    //public async Task<FinalsGradeUploadResult> CalculateFinalsGradesForSubjectAsync(int subjectId, int academicPeriodId)
+    //{
+    //    var result = new FinalsGradeUploadResult();
 
-        var gradeScale = await _context.GradePointEquivalents.ToListAsync();
-        var weights = await _context.GradeWeights.FirstOrDefaultAsync();
+    //    var gradeScale = await _context.GradePointEquivalents.ToListAsync();
+    //    var weights = await _context.GradeWeights.FirstOrDefaultAsync();
 
-        if (weights == null)
-        {
-            result.Warnings.Add("Grade weights not found in the database.");
-            return result;
-        }
+    //    if (weights == null)
+    //    {
+    //        result.Warnings.Add("Grade weights not found in the database.");
+    //        return result;
+    //    }
 
-        // Get all finals grades for the given subject and period
-        var finalsGrades = await _context.FinalsGrades
-            .Include(f => f.Quizzes)
-            .Include(f => f.ClassStandingItems)
-            .Include(f => f.Subject)
-            .ThenInclude(s => s.Teacher)
-            .Where(f => f.SubjectId == subjectId && f.AcademicPeriodId == academicPeriodId)
-            .ToListAsync();
+    //    // Get all finals grades for the given subject and period
+    //    var finalsGrades = await _context.FinalsGrades
+    //        .Include(f => f.Quizzes)
+    //        .Include(f => f.ClassStandingItems)
+    //        .Include(f => f.Subject)
+    //        .ThenInclude(s => s.Teacher)
+    //        .Where(f => f.SubjectId == subjectId && f.AcademicPeriodId == academicPeriodId)
+    //        .ToListAsync();
 
-        if (!finalsGrades.Any())
-        {
-            result.Warnings.Add("No finals grade records found for the specified subject and academic period.");
-            return result;
-        }
+    //    if (!finalsGrades.Any())
+    //    {
+    //        result.Warnings.Add("No finals grade records found for the specified subject and academic period.");
+    //        return result;
+    //    }
 
-        foreach (var grade in finalsGrades)
-        {
-            try
-            {
-                _calculateFinalGrade(grade, weights, gradeScale);
-                result.CalculatedGrades.Add(grade);
-            }
-            catch (Exception ex)
-            {
-                result.Warnings.Add($"Failed to calculate finals grade for student ID {grade.StudentId}: {ex.Message}");
-            }
-        }
+    //    foreach (var grade in finalsGrades)
+    //    {
+    //        try
+    //        {
+    //            _calculateFinalGrade(grade, weights, gradeScale);
+    //            result.CalculatedGrades.Add(grade);
+    //        }
+    //        catch (Exception ex)
+    //        {
+    //            result.Warnings.Add($"Failed to calculate finals grade for student ID {grade.StudentId}: {ex.Message}");
+    //        }
+    //    }
 
-        await _context.SaveChangesAsync();
-        return result;
-    }
+    //    await _context.SaveChangesAsync();
+    //    return result;
+    //}
 
 
     public async Task<IEnumerable<MidtermGradeDto>> GetGradesBySubjectAndPeriodAsync(int subjectId, int academicPeriodId)

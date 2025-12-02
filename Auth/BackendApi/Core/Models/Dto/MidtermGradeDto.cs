@@ -31,7 +31,7 @@
         public ICollection<QuizListDto> Quizzes { get; set; } = new List<QuizListDto>();
         public int TotalQuizScore { get; set; }
         public decimal QuizPG { get; set; }
-        public decimal QuizWeighted { get; set; }
+        public decimal QuizWeightedTotal { get; set; }
 
         public int RecitationScore { get; set; }
         public int AttendanceScore { get; set; }

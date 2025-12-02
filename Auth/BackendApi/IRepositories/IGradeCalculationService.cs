@@ -27,8 +27,8 @@ namespace BackendApi.IRepositories
         Task<bool> AddClassStandingToMidtermGradeAsync(int studentId, int gradeId, string label, int score, int total);
         Task<MidtermGrade> CalculateAndSaveSingleMidtermGradeAsyncV2(MidtermGradeDto dto);
 
-        Task<MidtermGradeUploadResult> CalculateMidtermGradesForSubjectAsync(int subjectId, int academicPeriodId);
-        Task<FinalsGradeUploadResult> CalculateFinalsGradesForSubjectAsync(int subjectId, int academicPeriodId);
+        //Task<MidtermGradeUploadResult> CalculateMidtermGradesForSubjectAsync(int subjectId, int academicPeriodId);
+        //Task<FinalsGradeUploadResult> CalculateFinalsGradesForSubjectAsync(int subjectId, int academicPeriodId);
 
         Task<IEnumerable<MidtermGradeDto>> GetGradesBySubjectAndPeriodAsync(int subjectId, int academicPeriodId);
         Task<bool> UpdateMidtermGradeAsync(int studentId, MidtermGradeDto updatedGrade);

@@ -28,6 +28,10 @@ namespace BackendApi.Context
         public DbSet<StudentEnrollment> StudentEnrollments { get; set; }
         public DbSet<CurriculumSubject> CurriculumSubjects { get; set; }
         public DbSet<FinalCourseGrade> FinalCourseGrades { get; set; }
+        public DbSet<GradeFormula> GradeFormulas { get; set; }
+        public DbSet<GradeFormulaItem> GradeFormulaItems { get; set; }
+        public DbSet<PointGradeAverageFormula> PointGradeAverageFormulas { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

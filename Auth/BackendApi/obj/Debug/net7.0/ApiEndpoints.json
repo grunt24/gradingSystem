@@ -637,6 +637,154 @@
     "ReturnTypes": []
   },
   {
+    "ContainingType": "BackendApi.Controllers.GradeFormulaItemsController",
+    "Method": "CreateItem",
+    "RelativePath": "api/GradeFormulaItems",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BackendApi.Core.Models.Dto.GradeFormulaItemDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.GradeFormulaItemsController",
+    "Method": "UpdateItem",
+    "RelativePath": "api/GradeFormulaItems/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "BackendApi.Core.Models.Dto.GradeFormulaItemDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.GradeFormulaItemsController",
+    "Method": "DeleteItem",
+    "RelativePath": "api/GradeFormulaItems/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.GradeFormulaItemsController",
+    "Method": "GetItemsByFormula",
+    "RelativePath": "api/GradeFormulaItems/formula/{formulaId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "formulaId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.GradeFormulasController",
+    "Method": "GetAll",
+    "RelativePath": "api/GradeFormulas",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.GradeFormulasController",
+    "Method": "Create",
+    "RelativePath": "api/GradeFormulas",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BackendApi.Core.Models.Dto.GradeFormulaDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.GradeFormulasController",
+    "Method": "GetById",
+    "RelativePath": "api/GradeFormulas/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.GradeFormulasController",
+    "Method": "Update",
+    "RelativePath": "api/GradeFormulas/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "BackendApi.Core.Models.Dto.GradeFormulaDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.GradeFormulasController",
+    "Method": "Delete",
+    "RelativePath": "api/GradeFormulas/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "BackendApi.Controllers.GradesController",
     "Method": "SaveGrades",
     "RelativePath": "api/Grades/save",
@@ -687,6 +835,59 @@
         "StatusCode": 200
       }
     ]
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.PointGradeAverageFormulaController",
+    "Method": "Create",
+    "RelativePath": "api/PointGradeAverageFormula",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "BackendApi.Core.Models.Dto.PointGradeAverageFormulaDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.PointGradeAverageFormulaController",
+    "Method": "GetByGradeFormula",
+    "RelativePath": "api/PointGradeAverageFormula/{gradeFormulaId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "gradeFormulaId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "BackendApi.Controllers.PointGradeAverageFormulaController",
+    "Method": "Update",
+    "RelativePath": "api/PointGradeAverageFormula/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "BackendApi.Core.Models.Dto.PointGradeAverageFormulaDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "BackendApi.Controllers.QuizzesController",
