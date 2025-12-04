@@ -145,6 +145,48 @@ namespace BackendApi.Controllers
             return Ok("Subject successfully added to curriculum");
         }
 
+        //[HttpGet("student/{studentId}/recommended-subjects")]
+        //public async Task<IActionResult> GetStudentRecommendedSubjects(int studentId)
+        //{
+        //    var student = await _context.Users
+        //        .AsNoTracking()
+        //        .FirstOrDefaultAsync(s => s.Id == studentId);
+
+        //    if (student == null)
+        //        return NotFound("Student not found.");
+
+        //    // Get current semester
+        //    var currentPeriod = await _context.AcademicPeriods
+        //        .AsNoTracking()
+        //        .FirstOrDefaultAsync(a => a.IsCurrent == true);
+
+        //    if (currentPeriod == null)
+        //        return BadRequest("No current academic period set.");
+
+        //    var yearLevel = student.YearLevel;  // "4" → 4
+        //    string semester = currentPeriod.Semester.ToLower();
+
+        //    var subjects = await _context.CurriculumSubjects
+        //        .Where(cs =>
+        //            cs.YearLevel == yearLevel &&
+        //            cs.Semester.ToLower() == semester
+        //        )
+        //        .Include(cs => cs.Subject)
+        //        .Select(cs => new
+        //        {
+        //            CurriculumSubjectId = cs.Id,
+        //            SubjectId = cs.Subject.Id,
+        //            SubjectCode = cs.Subject.SubjectCode,
+        //            SubjectName = cs.Subject.SubjectName,
+        //            Units = cs.Subject.Credits,
+        //            Semester = cs.Semester,
+        //            YearLevel = cs.YearLevel
+        //        })
+        //        .ToListAsync();
+
+        //    return Ok(subjects);
+        //}
+
         [HttpGet("student/{studentId}/recommended-subjects")]
         public async Task<IActionResult> GetStudentRecommendedSubjects(int studentId)
         {
@@ -163,15 +205,20 @@ namespace BackendApi.Controllers
             if (currentPeriod == null)
                 return BadRequest("No current academic period set.");
 
-            var yearLevel = student.YearLevel;  // "4" → 4
+            var yearLevel = student.YearLevel;
             string semester = currentPeriod.Semester.ToLower();
+            string studentDept = student.Department; // <-- ADD
 
             var subjects = await _context.CurriculumSubjects
+                .Include(cs => cs.Subject)
                 .Where(cs =>
                     cs.YearLevel == yearLevel &&
-                    cs.Semester.ToLower() == semester
+                    cs.Semester.ToLower() == semester &&
+                    (
+                        cs.Subject.Department == studentDept ||    // Match student's department
+                        cs.Subject.Department == "General"         // Or general subjects
+                    )
                 )
-                .Include(cs => cs.Subject)
                 .Select(cs => new
                 {
                     CurriculumSubjectId = cs.Id,
@@ -180,12 +227,14 @@ namespace BackendApi.Controllers
                     SubjectName = cs.Subject.SubjectName,
                     Units = cs.Subject.Credits,
                     Semester = cs.Semester,
-                    YearLevel = cs.YearLevel
+                    YearLevel = cs.YearLevel,
+                    Department = cs.Subject.Department
                 })
                 .ToListAsync();
 
             return Ok(subjects);
         }
+
 
         [HttpPost("update")]
         public async Task<IActionResult> UpdateStudentSubjects([FromBody] UpdateStudentSubjectsDTO dto)
@@ -206,11 +255,23 @@ namespace BackendApi.Controllers
                 .Where(cs => dto.CurriculumSubjectIds.Contains(cs.Id))
                 .ToListAsync();
 
+
+
             using var transaction = await _context.Database.BeginTransactionAsync();
+
+            var studentDept = student.Department;
             try
             {
                 foreach (var cs in curriculumSubjects)
                 {
+
+                    var subject = await _context.Subjects.FindAsync(cs.SubjectId);
+                    if (subject == null)
+                        return BadRequest($"Subject not found: {cs.SubjectId}");
+
+                    if (subject.Department != studentDept && subject.Department != "General")
+                        return BadRequest($"Subject {subject.SubjectName} does not match student’s department ({studentDept}).");
+
                     // Check if Midterm or Finals already exist for this student, subject, and period
                     var midtermExists = await _context.MidtermGrades.AnyAsync(m =>
                         m.StudentId == dto.StudentId &&
