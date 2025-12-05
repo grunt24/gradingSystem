@@ -60,6 +60,11 @@ namespace BackendApi.Context
                 .WithMany(g => g.ClassStandingItems)
                 .HasForeignKey(c => c.FinalsGradeId)
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Subject>()
+    .HasOne(s => s.Teacher)
+    .WithMany(t => t.Subjects)
+    .HasForeignKey(s => s.TeacherId)
+    .OnDelete(DeleteBehavior.SetNull);
 
             base.OnModelCreating(modelBuilder);
         }

@@ -18,7 +18,7 @@
         public ICollection<QuizListDto> Quizzes { get; set; } = new List<QuizListDto>();
         public int TotalQuizScore { get; set; }
         public decimal QuizPG { get; set; }
-        public decimal QuizWeighted { get; set; }
+        public decimal QuizWeightedTotal { get; set; }
 
         public int RecitationScore { get; set; }
         public int AttendanceScore { get; set; }
@@ -27,15 +27,15 @@
         public int ClassStandingTotalScore { get; set; }
         public decimal ClassStandingAverage { get; set; }
         public decimal ClassStandingPG { get; set; }
-        public decimal ClassStandingWeighted { get; set; }
+        public decimal ClassStandingWeightedTotal { get; set; }
 
         public int SEPScore { get; set; }
         public decimal SEPPG { get; set; }
-        public decimal SEPWeighted { get; set; }
+        public decimal SEPWeightedTotal { get; set; }
 
         public int ProjectScore { get; set; }
         public decimal ProjectPG { get; set; }
-        public decimal ProjectWeighted { get; set; }
+        public decimal ProjectWeightedTotal { get; set; }
 
         // Prelim and Midterm Exam (30% of the grade)
         public int FinalsScore { get; set; }

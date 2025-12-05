@@ -3047,7 +3047,7 @@
             "type": "number",
             "format": "double"
           },
-          "quizWeighted": {
+          "quizWeightedTotal": {
             "type": "number",
             "format": "double"
           },
@@ -3078,7 +3078,7 @@
             "type": "number",
             "format": "double"
           },
-          "classStandingWeighted": {
+          "classStandingWeightedTotal": {
             "type": "number",
             "format": "double"
           },
@@ -3090,7 +3090,7 @@
             "type": "number",
             "format": "double"
           },
-          "sepWeighted": {
+          "sepWeightedTotal": {
             "type": "number",
             "format": "double"
           },
@@ -3102,7 +3102,7 @@
             "type": "number",
             "format": "double"
           },
-          "projectWeighted": {
+          "projectWeightedTotal": {
             "type": "number",
             "format": "double"
           },

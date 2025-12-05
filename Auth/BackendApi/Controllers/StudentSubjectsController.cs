@@ -269,7 +269,7 @@ namespace BackendApi.Controllers
                     if (subject == null)
                         return BadRequest($"Subject not found: {cs.SubjectId}");
 
-                    if (subject.Department != studentDept && subject.Department != "General")
+                    if (subject.Department != studentDept && subject.Department != "GENERAL")
                         return BadRequest($"Subject {subject.SubjectName} does not match student’s department ({studentDept}).");
 
                     // Check if Midterm or Finals already exist for this student, subject, and period

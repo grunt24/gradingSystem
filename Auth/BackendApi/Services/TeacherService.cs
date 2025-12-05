@@ -132,50 +132,62 @@ namespace BackendApi.Services
         }
         public async Task<GeneralServiceResponse> UpdateTeacher(int id, TeacherDto teacherDto)
         {
-            var currentUser = await _authRepository.GetCurrentUserAsync();
-
-            var existingTeacher = await _context.Teachers
-                .Include(t => t.Subjects)
-                .FirstOrDefaultAsync(t => t.Id == id);
-
-            if (existingTeacher == null)
-            {
-                return new GeneralServiceResponse
-                {
-                    Success = false,
-                    Message = "Teacher not found"
-                };
-            }
-
-            using var transaction = await _context.Database.BeginTransactionAsync();
-
             try
             {
-                existingTeacher.Fullname = teacherDto.Fullname;
-                existingTeacher.UserID = teacherDto.UserId;
+                var existingTeacher = await _context.Teachers
+                    .Include(t => t.Subjects)
+                    .FirstOrDefaultAsync(t => t.Id == id);
 
-                existingTeacher.Subjects.Clear();
-
-                if (teacherDto.SubjectIds.Any())
+                if (existingTeacher == null)
                 {
-                    var subjects = await _context.Subjects
-                        .Where(s => teacherDto.SubjectIds.Contains(s.Id))
-                        .ToListAsync();
-
-                    foreach (var sub in subjects)
-                        existingTeacher.Subjects.Add(sub);
+                    return new GeneralServiceResponse
+                    {
+                        Success = false,
+                        Message = "Teacher not found."
+                    };
                 }
 
-                //var userEvent = new UserEvent
-                //{
-                //    UserId = currentUser.Id,
-                //    Timestamp = _authRepository.TimeStampFormat(),
-                //    EventDescription = $"{currentUser.Username.Pascalize()} updated teacher: {existingTeacher.Fullname}"
-                //};
+                if (teacherDto.Fullname != null)
+                {
+                    existingTeacher.Fullname = teacherDto.Fullname;
+                }
+                // Update basic teacher info
 
-                //await _context.UserEvents.AddAsync(userEvent);
+                // Prepare new subject IDs
+                var newSubjectIds = teacherDto.SubjectIds ?? new List<int>();
+
+                // 1️⃣ Remove TeacherId from ALL subjects currently assigned to this teacher
+                var currentlyAssigned = await _context.Subjects
+                    .Where(s => s.TeacherId == existingTeacher.Id)
+                    .ToListAsync();
+
+                foreach (var sub in currentlyAssigned)
+                {
+                    sub.TeacherId = null;
+                }
+
+                // 2️⃣ Assign new subjects from DTO to this teacher
+                if (newSubjectIds.Any())
+                {
+                    var subjectsToAssign = await _context.Subjects
+                        .Where(s => newSubjectIds.Contains(s.Id))
+                        .ToListAsync();
+
+                    foreach (var sub in subjectsToAssign)
+                    {
+                        sub.TeacherId = existingTeacher.Id;
+                    }
+
+                    // Update navigation property
+                    existingTeacher.Subjects = subjectsToAssign;
+                }
+                else
+                {
+                    // No subjects selected
+                    existingTeacher.Subjects?.Clear();
+                }
+
                 await _context.SaveChangesAsync();
-                await transaction.CommitAsync();
 
                 return new GeneralServiceResponse
                 {
@@ -183,12 +195,16 @@ namespace BackendApi.Services
                     Message = "Teacher updated successfully."
                 };
             }
-            catch
+            catch (Exception ex)
             {
-                await transaction.RollbackAsync();
-                throw;
+                return new GeneralServiceResponse
+                {
+                    Success = false,
+                    Message = $"Failed to update teacher: {ex.Message}"
+                };
             }
         }
+
         public async Task<GeneralServiceResponse> DeleteTeacher(int id)
         {
             var currentUser = await _authRepository.GetCurrentUserAsync();
